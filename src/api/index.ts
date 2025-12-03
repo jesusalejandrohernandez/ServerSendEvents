@@ -3,7 +3,6 @@ import * as http from 'http';
 import * as swaggerUi from 'swagger-ui-express';
 import sseRouter from './sseRouter';
 let swaggerDoc: Object;
-
 try {
     swaggerDoc = require('../../swagger.json');
 } catch (error) {
@@ -13,32 +12,11 @@ try {
     console.log('  $ swagger-jsdoc -d swaggerDef.js -o swagger.json');
     console.log('***************************************************');
 }
-
-/**
- * @export
- * @param {express.Application} app
- */
 export function init(app: express.Application): void {
     const router: express.Router = express.Router();
-
-    /**
-     * middlewares
-     */
      app.use(express.json());
      app.use(express.urlencoded({ extended: false }));
-
-    /**
-     * @description Forwards any requests to the /auth URI to our AuthRouter
-     * @constructs
-     */
     app.use('/', sseRouter);
-
-    /**
-     * @description
-     *  If swagger.json file exists in root folder, shows swagger api description
-     *  else send commands, how to get swagger.json file
-     * @constructs
-     */
     if (swaggerDoc) {
         app.use('/docs', swaggerUi.serve);
         app.get('/docs', swaggerUi.setup(swaggerDoc));
@@ -49,17 +27,8 @@ export function init(app: express.Application): void {
                 '<p>Then, restart your application</p>');
         });
     }
-
-    /** 
-     * @description No results returned mean the object is not found
-     * @constructs
-     */
     app.use((req, res, next) => {
         res.status(404).send(http.STATUS_CODES[404]);
     });
-
-    /**
-     * @constructs all routes
-     */
     app.use(router);
 }

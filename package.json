@@ -8,7 +8,7 @@
     "start": "tsc && npm run copy-files && node ./build/src/config/server/index.js",
     "test": "mocha --exit",
     "coverage": "nyc mocha --exit",
-    "copy-files": "cp ./src/api/index.html ./build/src/api/index.html",
+    "copy-files": "cp -r ./src/api/* ./build/src/api/",
     "tsc": "tsc"
   },
   "author": "Arquitectura Axity",

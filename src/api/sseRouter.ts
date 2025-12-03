@@ -1,112 +1,27 @@
 import { Router } from 'express';
 import { sseFacade } from '../facade';
-const path = require('path');
+import * as path from 'path';
+import * as express from 'express';
 
-/**
- * @constant {express.Router}
- */
 const router: Router = Router();
 
-/**
- * GET method route
- * @example http://localhost:PORT/users
- * @swagger
- * /users/:
- *  post:
- *    description: Get all Users
- *    tags: ["Users"]
- *    responses:
- *      200:
- *        description: All Users
- *        content:
- *          appication/json:
- *            example:
- *              status: 200
- *              message: Users
- */
+// Servir archivos estáticos de /src/api (index.html, app.js, etc.)
+router.use(express.static(path.join(__dirname)));
+
 router.get('/subscribe/:id/:channel?', sseFacade.event);
+router.post('/send', sseFacade.send);
 
-/**
- * GET method route
- * @example http://localhost:PORT/users
- * @swagger
- * /users/:
- *  post:
- *    description: Get all Users
- *    tags: ["Users"]
- *    responses:
- *      200:
- *        description: All Users
- *        content:
- *          appication/json:
- *            example:
- *              status: 200
- *              message: Users
- */
- router.post('/send', sseFacade.send);
-
-/**
- * GET method route
- * @example http://localhost:PORT/ping
- * @swagger
- * /ping/:
- *  post:
- *    description: Test service
- *    tags: ["Ping"]
- *    responses:
- *      200:
- *        description: Pong
- *        content:
- *          appication/json:
- *            example:
- *              status: 200
- *              message: pong
- */
- router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '/index.html'));
-  });
-
-/**
- * OPTIONS method route
- * @example http://localhost:PORT/subscribe
- * @swagger
- * /ping/:
- *  post:
- *    description: Test service
- *    tags: ["subscribe"]
- *    responses:
- *      200:
- *        description: Pong
- *        content:
- *          appication/json:
- *            example:
- *              status: 200
- *              message: pong
- */
-router.options("/subscribe/:id/:channel?", sseFacade.options);
-
-/**
- * GET method route
- * @example http://localhost:PORT/ping
- * @swagger
- * /ping/:
- *  post:
- *    description: Test service
- *    tags: ["Ping"]
- *    responses:
- *      200:
- *        description: Pong
- *        content:
- *          appication/json:
- *            example:
- *              status: 200
- *              message: pong
- */
-router.get('/ping', async (req, res) => {
-    res.send('pong');
+router.get('/', (req, res) => {
+  // Evitar caché del index para que no se sirva la versión antigua con inline script
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.sendFile(path.join(__dirname, '/index.html'));
 });
 
-/**
- * @export {express.Router}
- */
+router.options('/subscribe/:id/:channel?', sseFacade.options);
+router.get('/ping', async (req, res) => {
+  res.send('pong');
+});
+
 export default router;
